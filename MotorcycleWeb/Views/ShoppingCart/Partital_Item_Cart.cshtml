@@ -1,0 +1,76 @@
+﻿@model IEnumerable<MotorcycleWeb.Models.ShoppingCartItem>
+<table class="table">
+    <tr class="text-center">
+        <th>STT</th>
+        <th>Ảnh sản phẩm</th>
+        <th>Tên sản phẩm</th>
+        <th>Danh mục</th>
+        <th>Giá</th>
+        <th style="width:100px">Số lượng</th>
+        <th>Thành tiền</th>
+        <th> Thao tác</th>
+    </tr>
+    @if (Model != null && Model.Any())
+    {
+        var i = 0;
+        long totalPrice = 0;  
+
+        foreach (var item in Model)
+        {
+            totalPrice += item.TotalPrice;   
+            <tr class="text-center" id="trow_@item.ProductId">
+                <td>@(i + 1)</td>
+                <td><img src="@item.ProductImg" width="60" /></td>
+                <td>@item.ProductName</td>
+                <td>@item.CategoryName</td>
+                <td>@item.Price.ToString("#,##0") VND</td>
+                <td>
+                    <input type="number"
+                           class="form-control quantity"
+                           id="Quantity_@item.ProductId"
+                           value="@item.Quantity"
+                           min="1"
+                           data-id="@item.ProductId"
+                           data-price="@item.Price" />
+                </td>
+                <th class="item-total">@item.TotalPrice.ToString("#,##0") VND</th>
+                <td>
+                    <a href="#"
+                       data-id="@item.ProductId"
+                       class="btn btn-sm btn-outline-danger btnDelete">
+                        <i class="fa fa-trash"></i> Xóa
+                    </a>
+                </td>
+            </tr>
+            i++;
+        }
+        <tr>
+            <th colspan="6" class="text-right">Tổng: </th>
+            <th class="text-center total-cart">@totalPrice.ToString("#,##0") VND</th>
+            <th></th>
+        </tr>
+        @*<tr class="col-md-12">
+                <td class="text-right">
+                    <a href="#" class="btn  btn-danger btnDeleteAll">Xóa</a>
+                    <a href="/thanh-toan" class="btn  btn-success">Thanh toán</a>
+                </td>
+            </tr>*@
+    }
+    else
+    {
+        <tr><th colspan="8">Không có sản phẩm trong giỏ hàng! </th></tr>
+    }
+
+</table>
+@if (Model != null && Model.Any())
+{
+    <div class="d-flex justify-content-end mt-3 gap-2">
+
+        <a href="/thanh-toan" class="btn btn-success">
+            <i class="fa fa-credit-card"></i> Thanh toán
+        </a>
+        <a href="#" class="btn btn-outline-danger btnDeleteAll">
+            <i class="fa fa-trash"></i> Xóa tất cả
+        </a>
+    </div>
+}

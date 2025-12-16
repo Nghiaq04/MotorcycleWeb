@@ -1,0 +1,60 @@
+﻿@model MotorcycleWeb.Models.EF.Order
+@{
+    ViewBag.Title = "Chi tiết đơn hàng #" + Model.Code;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5 mb-5">
+    <h2 class="mb-4 text-center">@ViewBag.Title</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p><strong>Ngày đặt:</strong> @Model.CreateDate.ToString("dd/MM/yyyy")</p>
+            <p><strong>Tổng tiền:</strong> @Model.TotalAmount.ToString("#,##0") VND</p>
+            <p>
+                <strong>Trạng thái thanh toán:</strong>
+                @(Model.TypePayment == 1 ? "Thanh toán khi nhận hàng" : "Đã thanh toán online")
+            </p>
+
+            <hr />
+
+            <h4 class="mb-3">Sản phẩm trong đơn hàng:</h4>
+            <table class="table table-bordered text-center">
+                <thead class="bg-secondary text-white">
+                    <tr>
+                        <th>#</th>
+                        <th>Ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Giá</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                        foreach (var item in Model.OrderDetails)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td><img src="@item.Product.ProductImage" width="60" /></td>
+                                <td>@item.Product</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Price.ToString("#,##0") VND</td>
+                                <td>@(item.Quantity * item.Price).ToString("#,##0") VND</td>
+                            </tr>
+;
+                            i++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="@Url.Action("List", "OrderHistory", new { area = "Admin" })" class="btn btn-outline-secondary">
+            ← Quay lại danh sách đơn hàng
+        </a>
+    </div>
+</div>

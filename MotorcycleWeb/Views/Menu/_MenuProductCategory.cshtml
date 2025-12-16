@@ -1,0 +1,102 @@
+﻿@model IEnumerable<MotorcycleWeb.Models.EF.ProductCategory>
+
+@if (Model != null && Model.Any())
+{
+    <div class="banner">
+        <div class="container">
+
+            <!-- Hàng 1 -->
+            <div class="row">
+                @foreach (var items in Model.Take(3))
+                {
+                    string imagePath = "";
+
+                    switch (items.Alias.ToLower().Trim()) // thêm ToLower+Trim cho chắc
+                    {
+                        case "phu-tung":
+                            imagePath = "~/Content/assets/images/phutung.jpg";
+                            break;
+                        case "xe-tay-ga":
+                            imagePath = "~/Content/assets/images/xetayga.png";
+                            break;
+                        case "xe-so":
+                            imagePath = "~/Content/assets/images/xeso.png";
+                            break;
+                        case "xe-con-tay":
+                            imagePath = "~/Content/assets/images/xetaycon.png";
+                            break;
+                        case "xe-phan-khoi-lon":
+                            imagePath = "~/Content/assets/images/xephankhoilon.png";
+                            break;
+                        case "xe-dien":
+                            imagePath = "~/Content/assets/images/xedien.png";
+                            break;
+                        default:
+                            imagePath = "~/Content/assets/images/default.png";
+                            break;
+                    }
+
+                    <div class="col-md-4">
+                        <!-- Ảnh -->
+                        <div class="banner_item align-items-center"
+                             style="background-image: url('@Url.Content(imagePath)'); height:170px; background-size:cover; border-radius:8px;">
+                        </div>
+
+                        <!-- Chữ nằm dưới ảnh -->
+                        <div class="banner_category text-center" style="margin-top:10px;">
+                            <a href="/danh-muc-san-pham/@items.Alias-@(items.Id)">@items.Title</a>
+                        </div>
+                    </div>
+
+                }
+            </div>
+
+            <!-- Hàng 2 -->
+            <div class="row" style="margin-top:30px;">
+                <!-- thêm khoảng cách nếu cần -->
+                @foreach (var items in Model.Skip(3).Take(3))
+                {
+                    string imagePath = "";
+
+                    switch (items.Alias.ToLower().Trim())
+                    {
+                        case "phu-tung":
+                            imagePath = "~/Content/assets/images/phutung.jpg";
+                            break;
+                        case "xe-tay-ga":
+                            imagePath = "~/Content/assets/images/xetayga.png";
+                            break;
+                        case "xe-so":
+                            imagePath = "~/Content/assets/images/xeso.png";
+                            break;
+                        case "xe-con-tay":
+                            imagePath = "~/Content/assets/images/xetaycon.png";
+                            break;
+                        case "xe-phan-khoi-lon":
+                            imagePath = "~/Content/assets/images/xephankhoilon.png";
+                            break;
+                        case "xe-dien":
+                            imagePath = "~/Content/assets/images/xedien.png";
+                            break;
+                        default:
+                            imagePath = "~/Content/assets/images/default.png";
+                            break;
+                    }
+
+                    <div class="col-md-4">
+                        <!-- Ảnh -->
+                        <div class="banner_item align-items-center"
+                             style="background-image: url('@Url.Content(imagePath)'); height:170px; background-size:cover; border-radius:8px;">
+                        </div>
+
+                        <!-- Chữ nằm dưới ảnh -->
+                        <div class="banner_category text-center" style="margin-top:10px;">
+                            <a href="/danh-muc-san-pham/@items.Alias-@(items.Id)">@items.Title</a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+}

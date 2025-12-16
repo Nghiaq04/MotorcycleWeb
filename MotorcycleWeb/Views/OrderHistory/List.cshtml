@@ -1,0 +1,46 @@
+﻿@model IEnumerable<MotorcycleWeb.Models.EF.Order>
+@{
+    ViewBag.Title = "Danh sách đơn hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5 mb-5">
+    <h2 class="mb-4 text-center">@ViewBag.Title</h2>
+
+    <table class="table table-bordered text-center">
+        <thead class="bg-secondary text-white">
+            <tr>
+                <th>#</th>
+                <th>Mã đơn hàng</th>
+                <th>Khách hàng</th>
+                <th>Tổng tiền</th>
+                <th>Ngày đặt</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int i = 1;
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td>@item.Code</td>
+                        <td>@item.CustomerName</td>
+                        <td>@item.TotalAmount.ToString("#,##0") VND</td>
+                        <td>@item.CreateDate.ToString("dd/MM/yyyy")</td>
+                        <td>@(item.TypePayment == 1 ? "Chờ thanh toán" : "Đã thanh toán")</td>
+                        <td>
+                            <a href="@Url.Action("Index", "OrderHistory", new { area = "Admin", id = item.Id })" class="btn btn-sm btn-outline-primary">
+                                Xem chi tiết
+                            </a>
+                        </td>
+                    </tr>
+;
+                    i++;
+                }
+            }
+        </tbody>
+    </table>
+</div>

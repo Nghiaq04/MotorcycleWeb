@@ -1,0 +1,99 @@
+﻿@model IEnumerable<MotorcycleWeb.Models.EF.Product>
+@{
+    ViewBag.Title = "So sánh sản phẩm";
+}
+
+
+<div class="container pt-5 mt-5 mb-5">
+    <div class="text-center mb-4"> 
+        <h2 class="mb-0 text-danger">So sánh sản phẩm</h2>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered text-center align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th class="align-middle" style="width:200px;">Thuộc tính</th>
+                        @foreach (var item in Model.Take(3))
+                        {
+                            <th class="align-middle">@item.Title</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Hình ảnh -->
+                    <tr>
+                        <td class="fw-bold bg-light align-middle">Hình ảnh</td>
+                        @foreach (var item in Model.Take(3))
+                        {
+                            var img = item.ProductImage.FirstOrDefault(x => x.IsDefault)?.Image ?? "";
+                            <td>
+                                <img src="@img" alt="@item.Title" class="img-fluid rounded mx-auto d-block" style="max-height:150px;" />
+                            </td>
+                        }
+                    </tr>
+
+                    <!-- Giá -->
+                    <tr>
+                        <td class="fw-bold bg-light align-middle">Giá</td>
+                        @foreach (var item in Model.Take(3))
+                        {
+                            <td>
+                                @if (item.PriceSale > 0)
+                                {
+                                    <div class="text-danger fw-bold">@item.PriceSale.GetValueOrDefault().ToString("#,##0") VND</div>
+                                    <div class="text-muted text-decoration-line-through">@item.Price.ToString("#,##0") VND</div>
+                                }
+                                else
+                                {
+                                    <div class="fw-bold">@item.Price.ToString("#,##0") VND</div>
+                                }
+                            </td>
+                        }
+                    </tr>
+
+                    <!-- Danh mục -->
+                    <tr>
+                        <td class="fw-bold bg-light align-middle">Danh mục</td>
+                        @foreach (var item in Model.Take(3))
+                        {
+                            <td>@item.ProductCategory.Title</td>
+                        }
+                    </tr>
+
+                    <!-- Mô tả / Chi tiết sản phẩm -->
+                    <tr>
+                        <td class="fw-bold bg-light align-middle">Mô tả</td>
+                        @foreach (var item in Model.Take(3))
+                        {
+                            <td class="text-start" style="max-width:300px; word-wrap: break-word;">
+                                @Html.Raw(item.Detail)
+                            </td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">Không có sản phẩm để so sánh.</p>
+    }
+</div>
+
+<style>
+    table.table thead th {
+        background-color: #f8f9fa;
+        vertical-align: middle;
+    }
+
+    table.table td img {
+        margin: auto;
+        display: block;
+    }
+    body {
+        padding-top: 100px; /* tăng hoặc giảm tùy chiều cao navbar */
+    }
+</style>

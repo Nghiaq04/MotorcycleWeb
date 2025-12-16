@@ -1,0 +1,83 @@
+﻿@model MotorcycleWeb.Models.EF.Order
+@{
+    ViewBag.Title = "Chi tiết đơn hàng #" + Model.Code;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container" style="margin-top:160px; margin-bottom:100px">
+    <main aria-labelledby="title" class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+        <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-body p-4">
+                <h2 id="title" class="text-center mb-4">@ViewBag.Title</h2>
+
+                <p><strong>Ngày đặt:</strong> @Model.CreateDate.ToString("dd/MM/yyyy")</p>
+                <p><strong>Tổng tiền:</strong> @Model.TotalAmount.ToString("#,##0") VND</p>
+                <p><strong>Thanh toán:</strong> @(Model.TypePayment == 1 ? "Thanh toán khi nhận hàng" : "Thanh toán thẻ ngân hàng")</p>
+                <p>
+                    <strong>Trạng thái đơn hàng:</strong>
+                    @{
+                        string statusText;
+                        switch (Model.Status)
+                        {
+                            case MotorcycleWeb.Models.EF.Enums.OrderStatus.Confirmed:
+                                statusText = "Chờ xác nhận";
+                                break;
+                            case MotorcycleWeb.Models.EF.Enums.OrderStatus.Delivering:
+                                statusText = "Đang giao";
+                                break;
+                            case MotorcycleWeb.Models.EF.Enums.OrderStatus.Delivered:
+                                statusText = "Giao thành công";
+                                break;
+                            default:
+                                statusText = "Chưa xác định";
+                                break;
+                        }
+                    }
+                    @statusText
+                </p>
+
+                <hr />
+
+                <h4 class="mb-3">Sản phẩm trong đơn hàng:</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="bg-secondary text-white">
+                            <tr>
+                                <th>#</th>
+                                <th>Ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Giá</th>
+                                <th>Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int i = 1;
+                                foreach (var item in Model.OrderDetails)
+                                {
+                                    var thanhTien = item.Quantity * item.Price;
+                                    <tr>
+                                        <td>@i</td>
+                                        <td><img src="@item.Product.Image" width="60" /></td>
+                                        <td>@item.Product.Title</td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.Price.ToString("#,##0") VND</td>
+                                        <td>@thanhTien.ToString("#,##0") VND</td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="@Url.Action("MyOrders", "OrderHistory")" class="btn btn-outline-secondary w-100">
+                        ← Quay lại danh sách đơn hàng
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

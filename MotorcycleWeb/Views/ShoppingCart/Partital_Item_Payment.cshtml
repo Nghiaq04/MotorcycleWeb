@@ -1,0 +1,48 @@
+﻿@model IEnumerable<MotorcycleWeb.Models.ShoppingCartItem>
+
+
+@if (Model != null && Model.Any())
+{
+    
+    <h3>
+        GIỎ HÀNG
+        <span style="float: right; position: relative; display: inline-block; ">
+            <i class="fa fa-shopping-cart"></i>
+            <span class="checkout_items">@Model.Count()</span>
+        </span>
+    </h3>
+
+    var i = 0;
+    long totalPrice = 0;
+    <div style="border:1px solid #808080;">
+        <table class="table">
+            <tr>
+                <td>Sản phẩm</td>
+                <td class="text-center" >Số lượng</td>
+                <td>Thành tiền</td>
+            </tr>
+            @foreach (var item in Model)
+            {
+                totalPrice += item.TotalPrice;
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td class="text-center">@item.Quantity</td>
+                    <td>@item.TotalPrice.ToString("#,##0") VND</td>
+                </tr>
+
+            }
+            <tr>
+                <th>Tổng tiền</th>
+                <th></th>
+                <th >@totalPrice.ToString("#,##0") VND</th>
+            </tr>
+        </table>
+    </div>
+
+}
+else
+{
+
+}
+
+

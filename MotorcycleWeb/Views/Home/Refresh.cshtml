@@ -1,0 +1,36 @@
+﻿@model MotorcycleWeb.Models.ThongKeModel
+@if(Model!=null)
+            {
+                <div class="thongke">
+                    <table class="table">
+                        <tr>
+                            <td>Hôm nay</td>
+                            <td>@Model.Homnay</td>
+                        </tr>
+                        <tr>
+                            <td>Hôm qua</td>
+                            <td>@Model.Homqua</td>
+                        </tr>
+                        <tr>
+                            <td>Tuần này</td>
+                            <td>@Model.Tuannay </td>
+                        </tr>
+                        <tr>
+                            <td>Tuần trước</td>
+                            <td>@Model.Tuantruoc </td>
+                        </tr>
+                        <tr>
+                            <td>Tháng này</td>
+                            <td>@Model.Thangnay </td>
+                        </tr>
+                        <tr>
+                            <td>Tháng trước</td>
+                            <td>@Model.Thangtruoc </td>
+                        </tr>
+                        <tr>
+                            <td>Số người online</td>
+                            <td>@ViewBag.visitors_online </td>
+                        </tr>
+                    </table>
+                </div>
+            }

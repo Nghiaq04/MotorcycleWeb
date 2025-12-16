@@ -1,0 +1,212 @@
+﻿@{
+    ViewBag.Title = "Thống kê doanh thu";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@*<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>@ViewBag.Title</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin/home">Home</a></li>
+                    <li class="breadcrumb-item active">Thống kê</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>*@
+
+<section class="content">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">📈 Báo cáo doanh thu theo ngày</h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool text-white" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                <button type="button" class="btn btn-tool text-white" data-card-widget="remove"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Bộ lọc ngày -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <label for="fromDate">Từ ngày:</label>
+                    <input type="text" id="fromDate" class="form-control" placeholder="Chọn ngày bắt đầu" autocomplete="off" />
+                </div>
+                <div class="col-md-3">
+                    <label for="toDate">Đến ngày:</label>
+                    <input type="text" id="toDate" class="form-control" placeholder="Chọn ngày kết thúc" autocomplete="off" />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button id="btnFilter" class="btn btn-primary w-100">
+                        <i class="fas fa-filter"></i> Lọc dữ liệu
+                    </button>
+                </div>
+            </div>
+
+            <!-- Biểu đồ + bảng -->
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="chart-container" style="position: relative; height: 350px;">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <table class="table table-bordered table-hover text-center">
+                        <thead class="bg-secondary text-white">
+                            <tr>
+                                <th>#</th>
+                                <th>Ngày</th>
+                                <th>Doanh thu</th>
+                                <th>Lợi nhuận</th>
+                            </tr>
+                        </thead>
+                        <tbody id="load_data"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <!-- Thư viện cần thiết -->
+    <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script src="~/Content/assets/plugins/chart.js/Chart.min.js"></script>
+
+    <script>
+        // ✅ Hàm định dạng tiền tệ Việt Nam
+        function formatVND(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        $(function () {
+            // ✅ Khởi tạo Date Range Picker cho input từ ngày & đến ngày
+            $('#fromDate, #toDate').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                autoUpdateInput: false,
+                locale: {
+                    format: 'DD/MM/YYYY',
+                    applyLabel: 'Chọn',
+                    cancelLabel: 'Hủy',
+                    daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                    monthNames: [
+                        'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                        'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+                    ],
+                    firstDay: 1
+                }
+            }).on('apply.daterangepicker', function (ev, picker) {
+                $(this).val(picker.startDate.format('DD/MM/YYYY'));
+            });
+
+            // ✅ Load dữ liệu mặc định
+            loadChartData('', '');
+
+            // ✅ Khi nhấn nút lọc
+            $('#btnFilter').click(function () {
+                const fromDate = $('#fromDate').val();
+                const toDate = $('#toDate').val();
+                loadChartData(fromDate, toDate);
+            });
+        });
+
+        // ✅ Hàm load dữ liệu + cập nhật biểu đồ
+        let barChartInstance = null;
+
+        function loadChartData(fromDate, toDate) {
+            $.ajax({
+                url: '/Admin/Home/GetStatistics',
+                type: 'GET',
+                data: { fromDate: fromDate, toDate: toDate },
+                beforeSend: function () {
+                    $('#btnFilter').prop('disabled', true).text('Đang tải...');
+                },
+                success: function (res) {
+                    $('#btnFilter').prop('disabled', false).html('<i class="fas fa-filter"></i> Lọc dữ liệu');
+
+                    if (!res.Data || res.Data.length === 0) {
+                        $('#load_data').html('<tr><td colspan="4">Không có dữ liệu</td></tr>');
+                        if (barChartInstance) barChartInstance.destroy();
+                        return;
+                    }
+
+                    const arrDate = [];
+                    const arrDoanhThu = [];
+                    const arrLoiNhuan = [];
+
+                    $.each(res.Data, function (i, item) {
+                        arrDate.push(item.Date);
+                        arrDoanhThu.push(item.DoanhThu);
+                        arrLoiNhuan.push(item.LoiNhuan);
+                    });
+
+                    // Vẽ biểu đồ
+                    const ctx = $('#barChart').get(0).getContext('2d');
+                    if (barChartInstance) barChartInstance.destroy();
+
+                    barChartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: arrDate,
+                            datasets: [
+                                {
+                                    label: 'Doanh thu',
+                                    backgroundColor: '#6c757d',
+                                    data: arrDoanhThu
+                                },
+                                {
+                                    label: 'Lợi nhuận',
+                                    backgroundColor: '#007bff',
+                                    data: arrLoiNhuan
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: value => value.toLocaleString('vi-VN')
+                                    }
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: ctx => formatVND(ctx.parsed.y)
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // Cập nhật bảng
+                    let html = '';
+                    $.each(res.Data, function (i, item) {
+                        html += `
+                                <tr>
+                                    <td>${i + 1}</td>
+                                    <td>${item.Date}</td>
+                                    <td>${formatVND(item.DoanhThu)}</td>
+                                    <td>${formatVND(item.LoiNhuan)}</td>
+                                </tr>`;
+                    });
+                    $('#load_data').html(html);
+                },
+                error: function () {
+                    alert('Lỗi khi tải dữ liệu!');
+                    $('#btnFilter').prop('disabled', false).html('<i class="fas fa-filter"></i> Lọc dữ liệu');
+                }
+            });
+        }
+    </script>
+}
