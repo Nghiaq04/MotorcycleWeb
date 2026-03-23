@@ -85,17 +85,19 @@ Email gửi cho admin khi có đơn hàng mới
 ## 📂 Cấu trúc thư mục
 
 
+```bash
 FashionWeb/
 │
 ├── Controllers/
 ├── Models/
 ├── Views/
 ├── Areas/
-│ └── Admin/
-│ ├── Controllers/
-│ ├── Views/
+│   └── Admin/
+│       ├── Controllers/
+│       ├── Views/
 │
 ├── Content/
 ├── Scripts/
 ├── App_Start/
 ├── Web.config
+```
